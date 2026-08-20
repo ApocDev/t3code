@@ -1,0 +1,139 @@
+apps/server/src/orchestration/decider.import.test.ts
+  s_f31300ded7cb99::t_12a72c39c1fd46 1-111
+apps/server/src/orchestration/decider.ts
+  s_f31300ded7cb99::t_e3c9a9ae6b5090 381-444
+apps/server/src/provider/Layers/ClaudeAdapter.test.ts
+  s_f31300ded7cb99::t_bf1cab79df0310 11,14,161-162,178-183,281-355
+apps/server/src/provider/Layers/ClaudeAdapter.ts
+  s_4159c36783b145::t_a1edb398b2eece 22-25,229-232,262-286,1403-1412,1417-1516,4079
+apps/server/src/provider/Layers/CodexAdapter.ts
+  s_4159c36783b145::t_c9db39a55a5e2d 29,33,38,40,42,44,71-73,82-89,103,1381,1396-1559,1890
+apps/server/src/provider/Layers/CodexProvider.ts
+  s_4159c36783b145::t_ef151c75065289 322-344,347-370,373-397,399-407,412-415,417-418
+apps/server/src/provider/Layers/CodexSessionRuntime.test.ts
+  s_4159c36783b145::t_bd6fc4a55392e9 4,6,23,312-358
+apps/server/src/provider/Layers/CodexSessionRuntime.ts
+  s_f31300ded7cb99::t_e0d2739e7f358f 453-472,1249
+apps/server/src/provider/Services/ProviderAdapter.ts
+  s_f31300ded7cb99::t_232bf7399494cb 45-76,84-86
+apps/server/src/server.ts
+  s_4159c36783b145::t_5442fffc929106 33,241-245,357
+apps/web/src/components/ChatView.tsx
+  s_4159c36783b145::t_64f7517823f21e 2481-2494,5839,5965
+apps/web/src/components/chat/ChatComposer.tsx
+  s_4159c36783b145::t_6c4f54fb0b69ac 568,664,1107-1117,1120-1126,3057
+apps/web/src/connection/platform.ts
+  s_f31300ded7cb99::t_102f9bcd800b1c 93,98
+packages/client-runtime/src/connection/supervisor.test.ts
+  s_f31300ded7cb99::t_7805de5c788583 851,866
+packages/client-runtime/src/connection/supervisor.ts
+  s_f31300ded7cb99::t_09eca5e52a9b36 417-421
+packages/client-runtime/src/connection/wakeups.ts
+  s_f31300ded7cb99::t_f3eb1502b256e7 7-9,17
+packages/client-runtime/src/state/shell-sync.test.ts
+  s_f31300ded7cb99::t_cdbeb19b730546 347-353
+packages/client-runtime/src/state/threads-sync.test.ts
+  s_f31300ded7cb99::t_6988b3bb116193 712-717
+packages/contracts/src/index.ts
+  s_f31300ded7cb99::t_aac97fac35b830 14
+packages/contracts/src/orchestration.ts
+  s_f31300ded7cb99::t_05cad92bd24e72 888-910,912
+packages/contracts/src/providerConversation.ts
+  s_f31300ded7cb99::t_590ee3944b9917 1-63
+pnpm-lock.yaml
+  s_7242edcbc5bbd1::t_06fd35e8e87613 5148,5153,5966
+README.md
+  s_4159c36783b145::t_c9e07ed63b28e5 74
+apps/server/src/auth/RpcAuthorization.ts
+  s_4159c36783b145::t_7dbed9c5e5a8ef 33,62-63
+apps/server/src/provider/Drivers/ClaudeDriver.ts
+  s_4159c36783b145::t_e453777253e437 58,154-165,230
+apps/server/src/provider/Drivers/CodexDriver.ts
+  s_4159c36783b145::t_9a6efae093b0fb 39-43,45,169-188,234
+apps/server/src/provider/Layers/ProviderConversationImport.ts
+  s_4159c36783b145::t_b25b0506bbc9ac 1-118
+apps/server/src/provider/Layers/ProviderRegistry.test.ts
+  s_4159c36783b145::t_003c3191642447 841-846,856-859,901-904
+apps/server/src/provider/Layers/ProviderRegistry.ts
+  s_4159c36783b145::t_4b0b526ea83f4a 709-715
+apps/server/src/provider/ProviderDriver.ts
+  s_4159c36783b145::t_c5fba9bbc7526f 28,73-76
+apps/server/src/provider/ProviderInstanceEnvironment.test.ts
+  s_9618cc4770442b::t_e641ca1f1c08a1 21-29
+apps/server/src/provider/ProviderInstanceEnvironment.ts
+  s_9618cc4770442b::t_4302b6248f4303 8,11
+apps/server/src/provider/Services/ProviderConversationImport.ts
+  s_4159c36783b145::t_fb7969d4cb790e 1-67
+apps/server/src/provider/Services/ProviderRegistry.ts
+  s_4159c36783b145::t_445eb1f6054281 13,31-36
+apps/server/src/provider/providerMaintenanceRunner.test.ts
+  s_4159c36783b145::t_bb5989ec8abb2e 190
+apps/server/src/provider/testUtils/providerRegistryMock.ts
+  s_4159c36783b145::t_988c9bf6270d24 12
+apps/server/src/ws.ts
+  s_4159c36783b145::t_b8c2d56dab75ea 19-20,41-42,86,374-376,492-659,1559-1566,1867-1878
+apps/web/src/components/SidebarV2.tsx
+  s_4159c36783b145::t_0334d86d9909a6 15-19,30,163,181-194,201-212,1230-1233,1275-1332,1630-1691,3301-3494
+apps/web/vite.config.ts
+  s_92437bf956802c::t_e6f56944ac54cc 28-33
+docs/README.md
+  s_4159c36783b145::t_04c816f7009974 11
+docs/user/import-provider-conversations.md
+  s_4159c36783b145::t_5f2f41593ff5b7 1-22
+packages/client-runtime/src/state/projectCommands.ts
+  s_4159c36783b145::t_3d87d9394d4785 75-80,111-116
+packages/client-runtime/src/state/server.ts
+  s_4159c36783b145::t_bdd241248b65d6 676-681
+packages/contracts/src/rpc.ts
+  s_4159c36783b145::t_2258543c3677ae 67-73,140-141,184-185,236,302-307,487-504,825,854-855
+packages/contracts/src/server.ts
+  s_4159c36783b145::t_3b55017124366f 99-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "224275c47424c110c1b01865ac82a940a36dc804",
+  "prompts": {},
+  "sessions": {
+    "s_4159c36783b145": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00f96-3580-73d3-a764-535a78d79321",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    },
+    "s_7242edcbc5bbd1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019feba8-9d7e-7433-9a7e-5dc22ed56110",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    },
+    "s_92437bf956802c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "12a51bf1-8896-4d4b-a234-f24d140d4f03",
+        "model": "unknown"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    },
+    "s_9618cc4770442b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a014ce-4688-7c80-8200-bd072d4f621a",
+        "model": "unknown"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    },
+    "s_f31300ded7cb99": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00d49-410f-7b70-bbfa-08a26d44d72d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    }
+  }
+}
