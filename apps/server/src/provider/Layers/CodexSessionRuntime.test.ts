@@ -1,7 +1,9 @@
 import * as NodeAssert from "node:assert/strict";
 
 import { it } from "@effect/vitest";
+import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
+import * as Fiber from "effect/Fiber";
 import * as Schema from "effect/Schema";
 import { describe } from "vite-plus/test";
 import { DEFAULT_MODEL, ThreadId } from "@t3tools/contracts";
@@ -24,6 +26,7 @@ import {
   readCodexThread,
   rollbackCodexThread,
   toMcpElicitationResponse,
+  waitForCodexMcpStartup,
 } from "./CodexSessionRuntime.ts";
 const isCodexAppServerRequestError = Schema.is(CodexErrors.CodexAppServerRequestError);
 
@@ -673,6 +676,54 @@ describe("hasConfiguredMcpServer", () => {
       true,
     );
   });
+});
+
+describe("waitForCodexMcpStartup", () => {
+  it.effect("waits for the thread-scoped MCP status inventory", () =>
+    Effect.gen(function* () {
+      const response =
+        yield* Deferred.make<CodexRpc.ClientRequestResponsesByMethod["mcpServerStatus/list"]>();
+      const calls: Array<{ method: string; payload: unknown }> = [];
+      const client = {
+        request: (
+          method: "mcpServerStatus/list",
+          payload: CodexRpc.ClientRequestParamsByMethod["mcpServerStatus/list"],
+        ) => {
+          calls.push({ method, payload });
+          return Deferred.await(response);
+        },
+      };
+
+      const waitFiber = yield* waitForCodexMcpStartup({
+        client,
+        providerThreadId: "provider-thread-1",
+      }).pipe(Effect.forkChild);
+
+      yield* Effect.yieldNow;
+      NodeAssert.deepStrictEqual(calls, [
+        {
+          method: "mcpServerStatus/list",
+          payload: {
+            threadId: "provider-thread-1",
+            detail: "toolsAndAuthOnly",
+          },
+        },
+      ]);
+
+      yield* Deferred.succeed(response, {
+        data: [
+          {
+            name: "failed-server",
+            authStatus: "unsupported",
+            tools: {},
+            resources: [],
+            resourceTemplates: [],
+          },
+        ],
+      });
+      yield* Fiber.join(waitFiber);
+    }),
+  );
 });
 
 function makeThreadStartedNotification(

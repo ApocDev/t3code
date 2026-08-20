@@ -732,6 +732,26 @@ interface CodexThreadOpenClient {
   >;
 }
 
+interface CodexMcpStartupClient {
+  readonly request: (
+    method: "mcpServerStatus/list",
+    payload: CodexRpc.ClientRequestParamsByMethod["mcpServerStatus/list"],
+  ) => Effect.Effect<
+    CodexRpc.ClientRequestResponsesByMethod["mcpServerStatus/list"],
+    CodexErrors.CodexAppServerError
+  >;
+}
+
+export const waitForCodexMcpStartup = Effect.fn("waitForCodexMcpStartup")(function* (input: {
+  readonly client: CodexMcpStartupClient;
+  readonly providerThreadId: string;
+}) {
+  yield* input.client.request("mcpServerStatus/list", {
+    threadId: input.providerThreadId,
+    detail: "toolsAndAuthOnly",
+  });
+});
+
 export const openCodexThread = (input: {
   readonly client: CodexThreadOpenClient;
   readonly threadId: ThreadId;
@@ -2496,6 +2516,7 @@ export const makeCodexSessionRuntime = (
       });
 
       const providerThreadId = opened.thread.id;
+      yield* waitForCodexMcpStartup({ client, providerThreadId });
       const session = {
         ...(yield* Ref.get(sessionRef)),
         status: "ready",
@@ -2550,15 +2571,6 @@ export const makeCodexSessionRuntime = (
       sendTurn: (input) =>
         Effect.gen(function* () {
           const providerThreadId = yield* readProviderThreadId;
-          if (hasConfiguredMcpServer(options.appServerArgs)) {
-            yield* client.request("config/mcpServer/reload", undefined).pipe(
-              Effect.catch((cause) =>
-                Effect.logWarning("Failed to refresh Codex MCP tool catalog before turn.", {
-                  cause,
-                }),
-              ),
-            );
-          }
           const normalizedModel = normalizeCodexModelSlug(
             input.model ?? (yield* Ref.get(sessionRef)).model,
           );
