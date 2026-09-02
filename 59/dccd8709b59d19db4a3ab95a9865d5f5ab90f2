@@ -1,0 +1,29 @@
+apps/web/src/connection/platform.ts
+  s_4159c36783b145::t_b860286f07ce64 95,100
+packages/client-runtime/src/connection/supervisor.test.ts
+  s_4159c36783b145::t_bd5f471c3ff836 852,867
+packages/client-runtime/src/connection/supervisor.ts
+  s_4159c36783b145::t_5c0a6ec5a9d95e 421-425
+packages/client-runtime/src/connection/wakeups.ts
+  s_4159c36783b145::t_5d00d2930c90c0 7-9,17
+packages/client-runtime/src/state/threads-sync.test.ts
+  s_4159c36783b145::t_24852dbbe730b1 713-718
+packages/client-runtime/src/state/shell-sync.test.ts
+  s_4159c36783b145::t_f3fdb809da1010 355-361
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "59dccd8709b59d19db4a3ab95a9865d5f5ab90f2",
+  "prompts": {},
+  "sessions": {
+    "s_4159c36783b145": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00f96-3580-73d3-a764-535a78d79321",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    }
+  }
+}
