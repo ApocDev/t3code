@@ -1,0 +1,21 @@
+apps/server/src/provider/Layers/CodexSessionRuntime.test.ts
+  s_4159c36783b145::t_469e4821140af0 4,6,28,569-616
+apps/server/src/provider/Layers/CodexSessionRuntime.ts
+  s_4159c36783b145::t_ff15d267f65a3c 692-711,2270
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "028fe59f6a8ab8eafe8290cc18b8707126430919",
+  "prompts": {},
+  "sessions": {
+    "s_4159c36783b145": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00f96-3580-73d3-a764-535a78d79321",
+        "model": "unknown"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    }
+  }
+}
