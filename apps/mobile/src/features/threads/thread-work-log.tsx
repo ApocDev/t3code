@@ -53,6 +53,7 @@ import {
   resolveWorkEntryToolPresentation,
   type ToolGroupSummaryKind,
   workEntryViewedImagePath,
+  workEntryResultImagePaths,
 } from "@t3tools/client-runtime/work-log/presentation";
 import { resolveWorkGroupScrollAnchor } from "@t3tools/client-runtime/work-log/scroll-anchor";
 import type { MarkdownImageRenderer } from "../../native/SelectableMarkdownText";
@@ -897,6 +898,11 @@ const ThreadWorkLogRow = memo(function ThreadWorkLogRow(
               {props.renderImage({ href: viewedImagePath, alt: null, title: null })}
             </View>
           ) : null}
+          {workEntryResultImagePaths(row.workEntry).map((href) => (
+            <View key={href} className="pb-1.5">
+              {props.renderImage({ href, alt: null, title: null })}
+            </View>
+          ))}
           <ScrollView
             nestedScrollEnabled
             directionalLockEnabled

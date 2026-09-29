@@ -515,6 +515,23 @@ export function workEntryViewedImagePath(entry: WorkLogPresentationEntry): strin
     : null;
 }
 
+/** Image paths saved from tool output, shared by web and mobile tool details. */
+export function workEntryResultImagePaths(entry: WorkLogPresentationEntry): ReadonlyArray<string> {
+  const data = entry.toolData;
+  if (
+    !data ||
+    typeof data !== "object" ||
+    !("imagePaths" in data) ||
+    !Array.isArray(data.imagePaths)
+  ) {
+    return [];
+  }
+  return data.imagePaths.filter(
+    (value): value is string =>
+      typeof value === "string" && !/[\r\n]/.test(value) && isWorkspaceImagePreviewPath(value),
+  );
+}
+
 export interface ViewedImageAsset {
   readonly resource: Extract<AssetResource, { readonly _tag: "media-file" }>;
   readonly alt: string;

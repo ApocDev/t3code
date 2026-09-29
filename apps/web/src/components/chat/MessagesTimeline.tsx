@@ -31,6 +31,7 @@ import {
   workEntryViewedImagePath,
   summarizeToolGroup,
   omitSupersededLifecycleMarkers,
+  workEntryResultImagePaths,
 } from "@t3tools/client-runtime/work-log/presentation";
 import { resolveWorkGroupScrollAnchor } from "@t3tools/client-runtime/work-log/scroll-anchor";
 import type {
@@ -4772,6 +4773,16 @@ const PlainWorkEntryRow = memo(function PlainWorkEntryRow(props: {
           workspaceRoot,
         })
       : null;
+  const resultImages =
+    expanded && threadRef
+      ? workEntryResultImagePaths(workEntry).flatMap((source) => {
+          const image = resolveViewedImageAsset(source, {
+            threadId: threadRef.threadId,
+            workspaceRoot,
+          });
+          return image ? [image] : [];
+        })
+      : [];
   const canExpand =
     Boolean(workEntry.questionAnswer) ||
     (showFailedIndicator && previewText.trim().length > 0) ||
@@ -4907,23 +4918,26 @@ const PlainWorkEntryRow = memo(function PlainWorkEntryRow(props: {
           </span>
         </div>
       </div>
-      {expanded && viewedImage && threadRef ? (
-        <div
-          className="mt-1 ms-7 cursor-default"
-          onClick={stopRowToggle}
-          onPointerDown={stopRowToggle}
-        >
-          <ChatMarkdownAssetImage
-            environmentId={threadRef.environmentId}
-            resource={viewedImage.resource}
-            alt={viewedImage.alt}
-            srcFragment={viewedImage.srcFragment}
-            workspaceRoot={workspaceRoot}
-            maxHeightRem={16}
-            onImageExpand={onImageExpand}
-          />
-        </div>
-      ) : null}
+      {expanded &&
+        threadRef &&
+        (viewedImage ? [viewedImage, ...resultImages] : resultImages).map((image) => (
+          <div
+            key={image.alt}
+            className="mt-1 ms-7 cursor-default"
+            onClick={stopRowToggle}
+            onPointerDown={stopRowToggle}
+          >
+            <ChatMarkdownAssetImage
+              environmentId={threadRef.environmentId}
+              resource={image.resource}
+              alt={image.alt}
+              srcFragment={image.srcFragment}
+              workspaceRoot={workspaceRoot}
+              maxHeightRem={16}
+              onImageExpand={onImageExpand}
+            />
+          </div>
+        ))}
       {expanded && workEntry.questionAnswer ? (
         <QuestionAnswerHistory answer={workEntry.questionAnswer} />
       ) : null}

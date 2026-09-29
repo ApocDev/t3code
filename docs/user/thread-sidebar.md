@@ -144,6 +144,11 @@ Expand a tool call in the conversation to see its full command and output.
 Summaries shorten shell wrappers and can still describe the latest call after it
 finishes; the call's own result shows its status.
 
+Images returned by MCP tools in Claude threads are saved as attachments on the
+agent's machine. Expand the tool call to view them. The result includes each saved
+path so Claude can reference, copy, or upload the image. If saving fails, the
+result says so and Claude still receives the original image.
+
 ## Snooze until later
 
 Choose **Snooze → Custom…** from a thread's menu to pick a date and time in your

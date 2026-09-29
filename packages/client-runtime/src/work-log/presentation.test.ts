@@ -12,6 +12,7 @@ import {
   toolGroupSummaryKind,
   type WorkLogPresentationEntry,
   workEntryViewedImagePath,
+  workEntryResultImagePaths,
   workEntryIndicatesToolFailure,
   workEntryDisplayIndicatesToolFailure,
   workEntryIndicatesToolSuccess,
@@ -708,5 +709,25 @@ describe("device group summaries", () => {
         },
       ]),
     ).toBe("Used 1 tool");
+  });
+});
+
+describe("workEntryResultImagePaths", () => {
+  it("resolves saved tool images on the agent machine independently of the workspace", () => {
+    const paths = ["/home/agent/.t3/attachments/result.jpg", "C:\\agent\\attachments\\result.png"];
+    const entry = {
+      label: "Generate image",
+      tone: "tool",
+      toolData: { imagePaths: paths },
+    } as const;
+    expect(workEntryResultImagePaths(entry)).toEqual(paths);
+    for (const path of workEntryResultImagePaths(entry)) {
+      expect(
+        resolveViewedImageAsset(path, {
+          threadId: ThreadId.make("thread-1"),
+          workspaceRoot: "/workspace",
+        })?.resource,
+      ).toEqual({ _tag: "media-file", threadId: "thread-1", path });
+    }
   });
 });

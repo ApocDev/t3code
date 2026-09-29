@@ -941,6 +941,148 @@ describe("ClaudeAdapterLive", () => {
     );
   });
 
+  it.effect(
+    "saves MCP result images before Claude continues and emits paths without image bytes",
+    () => {
+      const baseDir = NodeFS.mkdtempSync(NodePath.join(NodeOS.tmpdir(), "claude-tool-images-"));
+      const harness = makeHarness({ baseDir });
+      return Effect.gen(function* () {
+        yield* Effect.addFinalizer(() =>
+          Effect.sync(() => NodeFS.rmSync(baseDir, { recursive: true, force: true })),
+        );
+        const adapter = yield* ClaudeAdapter;
+        const { attachmentsDir } = yield* ServerConfig;
+        const eventsFiber = yield* adapter.streamEvents.pipe(
+          Stream.takeUntil((event) => event.type === "item.completed"),
+          Stream.runCollect,
+          Effect.forkChild,
+        );
+        yield* adapter.startSession({
+          threadId: THREAD_ID,
+          provider: ProviderDriverKind.make("claudeAgent"),
+          runtimeMode: "full-access",
+        });
+        yield* adapter.sendTurn({
+          threadId: THREAD_ID,
+          input: "Generate two images",
+          attachments: [],
+        });
+        const hook = harness.getLastCreateQueryInput()?.options.hooks?.PostToolUse?.[0]?.hooks[0];
+        assert.isDefined(hook);
+        if (!hook) return;
+        const text = { type: "text", text: "model: test, cost: 0.01" };
+        const image = { type: "image", data: "AQIDBA==", mimeType: "image/jpeg" };
+        const secondImage = { type: "image", data: "BQYHCA==", mimeType: "image/png" };
+        const hookOutput = yield* Effect.promise(() =>
+          hook(
+            {
+              hook_event_name: "PostToolUse",
+              tool_name: "mcp__openrouter__generate-image",
+              tool_use_id: "generated-images",
+              tool_input: {},
+              tool_response: { content: [text, image, secondImage], isError: false },
+              session_id: "image-session",
+              transcript_path: "/unused/transcript.jsonl",
+              cwd: baseDir,
+            },
+            "generated-images",
+            { signal: new AbortController().signal },
+          ),
+        );
+        assert.ok("hookSpecificOutput" in hookOutput);
+        const specific =
+          "hookSpecificOutput" in hookOutput ? hookOutput.hookSpecificOutput : undefined;
+        assert.equal(specific?.hookEventName, "PostToolUse");
+        if (specific?.hookEventName !== "PostToolUse") return;
+        const files = NodeFS.readdirSync(attachmentsDir).sort();
+        assert.equal(files.length, 2);
+        const jpgPath = NodePath.join(
+          attachmentsDir,
+          files.find((file) => file.endsWith(".jpg"))!,
+        );
+        const pngPath = NodePath.join(
+          attachmentsDir,
+          files.find((file) => file.endsWith(".png"))!,
+        );
+        assert.deepEqual(NodeFS.readFileSync(jpgPath), Buffer.from([1, 2, 3, 4]));
+        assert.deepEqual(NodeFS.readFileSync(pngPath), Buffer.from([5, 6, 7, 8]));
+        assert.deepEqual(specific.updatedMCPToolOutput, {
+          content: [
+            text,
+            image,
+            { type: "text", text: `Image saved to: ${jpgPath}` },
+            secondImage,
+            { type: "text", text: `Image saved to: ${pngPath}` },
+          ],
+          isError: false,
+        });
+        harness.query.emit({
+          type: "stream_event",
+          session_id: "image-session",
+          uuid: "image-start",
+          parent_tool_use_id: null,
+          event: {
+            type: "content_block_start",
+            index: 1,
+            content_block: {
+              type: "tool_use",
+              id: "generated-images",
+              name: "mcp__openrouter__generate-image",
+              input: {},
+            },
+          },
+        } as unknown as SDKMessage);
+        harness.query.emit({
+          type: "user",
+          session_id: "image-session",
+          uuid: "image-result",
+          parent_tool_use_id: null,
+          message: {
+            role: "user",
+            content: [
+              {
+                type: "tool_result",
+                tool_use_id: "generated-images",
+                content: [
+                  text,
+                  {
+                    type: "image",
+                    source: { type: "base64", media_type: "image/jpeg", data: image.data },
+                  },
+                  { type: "text", text: `Image saved to: ${jpgPath}` },
+                  {
+                    type: "image",
+                    source: { type: "base64", media_type: "image/png", data: secondImage.data },
+                  },
+                  { type: "text", text: `Image saved to: ${pngPath}` },
+                ],
+              },
+            ],
+          },
+        } as unknown as SDKMessage);
+        const events = yield* Fiber.join(eventsFiber);
+        const completed = events.find((event) => event.type === "item.completed");
+        assert.equal(completed?.type, "item.completed");
+        if (completed?.type !== "item.completed") return;
+        assert.deepEqual(completed.payload.data, {
+          toolName: "mcp__openrouter__generate-image",
+          input: {},
+          imagePaths: [jpgPath, pngPath],
+          result: {
+            type: "tool_result",
+            tool_use_id: "generated-images",
+            content: [
+              text,
+              { type: "text", text: `Image saved to: ${jpgPath}` },
+              { type: "text", text: `Image saved to: ${pngPath}` },
+            ],
+          },
+        });
+        assert.deepEqual(NodeFS.readdirSync(attachmentsDir).sort(), files);
+      }).pipe(Effect.provide(harness.layer));
+    },
+  );
+
   it.effect("embeds image attachments in Claude user messages", () => {
     const baseDir = NodeFS.mkdtempSync(NodePath.join(NodeOS.tmpdir(), "claude-attachments-"));
     const harness = makeHarness({

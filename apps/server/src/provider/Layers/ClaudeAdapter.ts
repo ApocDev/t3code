@@ -87,6 +87,7 @@ import * as Stream from "effect/Stream";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 
 import { resolveAttachmentPath } from "../../attachmentStore.ts";
+import { persistClaudeToolImages } from "./ClaudeToolImages.ts";
 import { ServerConfig } from "../../config.ts";
 import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
 import { resolveClaudeSdkExecutablePath } from "../Drivers/ClaudeExecutable.ts";
@@ -429,6 +430,7 @@ interface ClaudeSessionContext {
    * message it ever produced. */
   readonly turns: Array<{ readonly id: TurnId }>;
   readonly inFlightTools: Map<number, ToolInFlight>;
+  readonly toolImagePaths: Map<string, ReadonlyArray<string | null>>;
   readonly claudeTasks: Map<string, ClaudeTaskState>;
   readonly taskAgents: Map<string, ClaudeTaskAgentState>;
   /**
@@ -2802,6 +2804,7 @@ export const makeClaudeAdapter = Effect.fn("makeClaudeAdapter")(function* (
     }
     // Clear any remaining stale entries (e.g. from interrupted content blocks)
     context.inFlightTools.clear();
+    context.toolImagePaths.clear();
 
     for (const block of turnState.assistantTextBlockOrder) {
       yield* completeAssistantTextBlock(context, block, {
@@ -3189,10 +3192,18 @@ export const makeClaudeAdapter = Effect.fn("makeClaudeAdapter")(function* (
       const [index, tool] = toolEntry;
       const itemStatus = toolResult.isError ? "failed" : "completed";
       const toolUseResult = readClaudeToolUseResult(message);
+      const images = yield* persistClaudeToolImages({
+        content: toolResult.block,
+        threadId: context.session.threadId,
+        attachmentsDir: serverConfig.attachmentsDir,
+        savedPaths: context.toolImagePaths.get(toolResult.toolUseId),
+      }).pipe(Effect.provideService(FileSystem.FileSystem, fileSystem));
+      context.toolImagePaths.delete(toolResult.toolUseId);
       const toolData = {
         toolName: tool.toolName,
         input: tool.input,
-        result: toolResult.block,
+        result: images.content,
+        ...(images.imagePaths.length > 0 ? { imagePaths: images.imagePaths } : {}),
       };
 
       const updatedStamp = yield* makeEventStamp();
@@ -4440,6 +4451,7 @@ export const makeClaudeAdapter = Effect.fn("makeClaudeAdapter")(function* (
       const pendingTaskModels = new Map<string, string>();
       const workflowMemberFingerprints = new Map<string, string>();
       const liveTaskIds = new Set<string>();
+      const toolImagePaths = new Map<string, ReadonlyArray<string | null>>();
 
       const contextRef = yield* Ref.make<ClaudeSessionContext | undefined>(undefined);
 
@@ -4942,6 +4954,33 @@ export const makeClaudeAdapter = Effect.fn("makeClaudeAdapter")(function* (
         ...(newSessionId ? { sessionId: newSessionId } : {}),
         includePartialMessages: true,
         canUseTool,
+        hooks: {
+          PostToolUse: [
+            {
+              matcher: "mcp__.*",
+              hooks: [
+                async (hookInput) => {
+                  if (hookInput.hook_event_name !== "PostToolUse") return {};
+                  const images = await runPromise(
+                    persistClaudeToolImages({
+                      content: hookInput.tool_response,
+                      threadId,
+                      attachmentsDir: serverConfig.attachmentsDir,
+                    }).pipe(Effect.provideService(FileSystem.FileSystem, fileSystem)),
+                  );
+                  if (images.savedPaths.length === 0) return {};
+                  toolImagePaths.set(hookInput.tool_use_id, images.savedPaths);
+                  return {
+                    hookSpecificOutput: {
+                      hookEventName: "PostToolUse",
+                      updatedMCPToolOutput: images.modelContent,
+                    },
+                  };
+                },
+              ],
+            },
+          ],
+        },
         onUserDialog,
         supportedDialogKinds: ["resume_return"],
         env: McpProviderSession.withAgentDeviceEnvironment(claudeEnvironment, mcpSession),
@@ -5042,6 +5081,7 @@ export const makeClaudeAdapter = Effect.fn("makeClaudeAdapter")(function* (
         pendingUserInputs,
         turns: [],
         inFlightTools,
+        toolImagePaths,
         claudeTasks,
         taskAgents,
         pendingTaskModels,
