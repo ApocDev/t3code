@@ -1,0 +1,21 @@
+apps/server/src/provider/Layers/CodexSessionRuntime.test.ts
+  s_4159c36783b145::t_469e4821140af0 4,6,29,681-728
+apps/server/src/provider/Layers/CodexSessionRuntime.ts
+  s_4159c36783b145::t_ff15d267f65a3c 735-754,2519
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "00c1f17530cd0491eb1ad3efadc6f176faee5a3b",
+  "prompts": {},
+  "sessions": {
+    "s_4159c36783b145": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00f96-3580-73d3-a764-535a78d79321",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ApocDev <apocdev@gmail.com>"
+    }
+  }
+}
